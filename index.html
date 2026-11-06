@@ -177,16 +177,20 @@
         label: "7日",
         weekday: "周六",
         color: "#b85c38",
-        title: "落地，只待酒店周边",
-        blurb: "樟宜到酒店，中午潮八八，晚上芽笼田鸡粥，有精神再去克拉码头坐船。不去植物园，也不进小印度。",
-        tips: "潮八八四人桌已经订好。田鸡粥只收现金，点姜葱、不要辣。7到9号不要自己开车，叫 GrabFamily 或 6 座。屠妖节前夜小印度会很挤。",
+        title: "机场瀑布、乌节路、坐船和金沙水秀",
+        blurb: "早上在星耀樟宜看室内瀑布，中午潮八八，午睡后去乌节路逛商场，晚饭田鸡粥，晚上坐船、看鱼尾狮，再去金沙看水秀。当天完全不进小印度。",
+        tips: "室内瀑布 10 点才开始往下淌，看完立刻出发去酒店，给潮八八留出时间。潮八八四人桌已经订好。午睡后去乌节路，从酒店打车大约 15 到 20 分钟，主要逛 ION Orchard，走不动就找地方坐下。17:40 出发去芽笼吃田鸡粥，大约 20 分钟车程。田鸡粥只收现金，点姜葱、不要辣。游船大约 40 分钟。下船后先去鱼尾狮，再绕到金沙 Event Plaza 看 22:00 的 Spectra（周六有 20:00、21:00、22:00 三场，免费约 15 分钟）。7 日落地当天赶 21:00 会太紧，看 22:00 那场即可。鱼尾狮和金沙都是滨海湾，和 10 号的滨海湾花园不是同一个地方。7 日是屠妖节前夜，警察已发通告：实龙岗路会严重塞车，部分过街位下午 4 点起封闭，千万别去小印度。7 到 9 号不要自己开车。",
         stops: [
-          { time: "07:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "落地后坐 GrabFamily 或 6 座去酒店。", lat: 1.3644, lng: 103.9915, far: true },
-          { time: "08:00", name: "V Hotel Lavender", addr: "70 Jellicoe Road", q: "V Hotel Lavender 70 Jellicoe Road", note: "放行李，附近吃点早餐。下午 3 点办理入住、午睡。", lat: 1.3078, lng: 103.8626 },
+          { time: "07:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "落地取行李后先去星耀樟宜。室内瀑布每天 10 点才开，到早了就在 Jewel 吃早餐等。", lat: 1.3644, lng: 103.9915, far: true },
+          { time: "10:00", name: "星耀樟宜室内瀑布", addr: "Jewel Changi Airport, Rain Vortex", q: "Jewel Changi Airport HSBC Rain Vortex", note: "免费。看 20 到 30 分钟就走，不要上 Canopy Park，否则赶不上 11:30 潮八八。", lat: 1.3602, lng: 103.9898, far: true },
+          { time: "10:35", name: "V Hotel Lavender", addr: "70 Jellicoe Road", q: "V Hotel Lavender 70 Jellicoe Road", note: "坐 GrabFamily 或 6 座去酒店放行李，接着去潮八八。", lat: 1.3078, lng: 103.8626 },
           { time: "11:30", name: "潮八八", addr: "101 Horne Road", q: "Chao Baba 101 Horne Road Singapore", note: "四人桌已订。离酒店很近。", lat: 1.3112, lng: 103.8617, tags: ["已订位"] },
-          { time: "15:00", name: "回酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "办理入住并午睡，养精神再出门。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
-          { time: "18:30", name: "明辉田鸡粥", addr: "323 Geylang Road", q: "Eminent Frog Porridge 323 Geylang Road", note: "从酒店过去几分钟。", lat: 1.3128, lng: 103.8793, tags: ["只收现金"] },
-          { time: "20:00", name: "克拉码头游船", addr: "Clarke Quay Jetty", q: "Clarke Quay Jetty Singapore River Cruise", note: "从芽笼打车大约 6 到 8 分钟。成人 28 新币，现场买即可。", lat: 1.2906, lng: 103.8465 }
+          { time: "13:30", name: "回酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "办理入住并午睡到 15 点左右，再出门。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "15:30", name: "乌节路 / ION Orchard", addr: "2 Orchard Turn", q: "ION Orchard 2 Orchard Turn Singapore", note: "从酒店打车大约 15 到 20 分钟。逛 ION 和乌节路一带商场，走不动就坐下休息。", lat: 1.3040, lng: 103.8318 },
+          { time: "18:30", name: "明辉田鸡粥", addr: "323 Geylang Road", q: "Eminent Frog Porridge 323 Geylang Road", note: "大约 17:40 从乌节路出发，打车大约 20 分钟。", lat: 1.3128, lng: 103.8793, tags: ["只收现金"] },
+          { time: "20:00", name: "克拉码头游船", addr: "Clarke Quay Jetty", q: "Clarke Quay Jetty Singapore River Cruise", note: "从芽笼打车大约 6 到 8 分钟。成人 28 新币，现场买即可，航程大约 40 分钟。", lat: 1.2906, lng: 103.8465 },
+          { time: "20:50", name: "鱼尾狮公园", addr: "Merlion Park, Fullerton Road", q: "Merlion Park Singapore", note: "下船后打车大约 5 分钟。看鱼尾狮和对面金沙，拍完照就上车，不要沿着湾走太久。", lat: 1.2868, lng: 103.8545 },
+          { time: "22:00", name: "金沙 Spectra 水秀", addr: "Event Plaza, Marina Bay Sands", q: "Marina Bay Sands Event Plaza Spectra", note: "免费，约 15 分钟。周六最后一场是 22:00。从鱼尾狮打车绕到金沙这边，途中经过螺旋桥。看完回酒店。", lat: 1.2850, lng: 103.8600 }
         ]
       },
       {
@@ -196,13 +200,13 @@
         weekday: "周日 · 屠妖节",
         color: "#1b6b7a",
         title: "整天圣淘沙",
-        blurb: "上午海洋馆，午饭就在怡丰城，下午西乐索海滩和缆车只选一样，晚上回酒店附近吃肉骨茶。",
+        blurb: "上午海洋馆，午饭就在怡丰城（VivoCity），下午西乐索海滩和缆车只选一样，晚上回酒店附近吃肉骨茶。",
         tips: "海洋馆门票不能退：成人 55 新币，60 岁以上 43 新币。圣淘沙捷运 4 新币。缆车大约 17 新币。屠妖节当晚不要进小印度。",
         stops: [
           { time: "出发", name: "V Hotel Lavender", addr: "70 Jellicoe Road", q: "V Hotel Lavender 70 Jellicoe Road", note: "地铁或 Grab 去怡丰城，不要自己开车。", lat: 1.3078, lng: 103.8626 },
-          { time: "上午", name: "怡丰城", addr: "1 HarbourFront Walk", q: "VivoCity Singapore", note: "在这里转圣淘沙捷运。", lat: 1.2644, lng: 103.8222 },
+          { time: "上午", name: "怡丰城（VivoCity）", addr: "1 HarbourFront Walk", q: "VivoCity Singapore", note: "就是 VivoCity，在这里转圣淘沙捷运。", lat: 1.2644, lng: 103.8222 },
           { time: "10:00–12:30", name: "新加坡海洋馆", addr: "8 Sentosa Gateway", q: "Singapore Oceanarium 8 Sentosa Gateway", note: "门票不能退。", lat: 1.2582, lng: 103.8200, tags: ["不能退票"] },
-          { time: "午饭", name: "怡丰城吃饭", addr: "VivoCity 3 楼食阁 / 鼎泰丰 / 名胜世界", q: "VivoCity Din Tai Fung Singapore", note: "选有空调的地方，食阁、鼎泰丰或名胜世界都可以。", lat: 1.2644, lng: 103.8222 },
+          { time: "午饭", name: "怡丰城（VivoCity）吃饭", addr: "VivoCity 3 楼食阁 / 鼎泰丰 / 名胜世界", q: "VivoCity Din Tai Fung Singapore", note: "选有空调的地方，食阁、鼎泰丰或名胜世界都可以。", lat: 1.2644, lng: 103.8222 },
           { time: "13:30–15:00", name: "西乐索海滩或缆车", addr: "Siloso Beach, Sentosa", q: "Siloso Beach Sentosa", note: "两样只选一样，老人不宜都走。然后回酒店休息。", lat: 1.2547, lng: 103.8118 },
           { time: "18:30", name: "颜金猛肉骨茶", addr: "347 Balestier Road", q: "Founder Bak Kut Teh 347 Balestier Road", note: "从酒店往北一小段。没有空调，胡椒味重。", lat: 1.3259, lng: 103.8517 }
         ]
@@ -213,12 +217,13 @@
         label: "9日",
         weekday: "周一 · 公休",
         color: "#2e6b3f",
-        title: "上午植物园，晚上夜间动物园",
-        blurb: "只在植物园门口走天鹅湖，中午去旁边登普西吃饭，下午午睡，傍晚先吃饭再进园。",
-        tips: "植物园只走 Tanglin 门和天鹅湖 40 到 60 分钟，不走北门、不进热带雨林。Grab 直接送到门口。夜间动物园最早 19:15 入园，门票不能退。不要把园内餐厅当正餐。可提前 2 小时预约夜间动物表演。门口能借免费轮椅，电车包含在门票里。去 Mandai 坐地铁到卡迪站再转园内巴士（2.5 新币），或直接 Grab。",
+        title: "兰花园、新大，晚上夜间动物园",
+        blurb: "上午看国家兰花园，中午去国大大学城吃饭，下午午睡，傍晚先吃饭再进夜间动物园。",
+        tips: "Grab 直接送到 Tanglin 门。先经过天鹅湖，重点看国家兰花园（最晚下午 6 点入园，7 点关门；成人 15 新币，60 岁以上 3 新币），有无障碍路线。不走北门、不进热带雨林。中午从植物园打车去国大大学城（NUS UTown，大约 15 到 20 分钟），在 Town Plaza 的 Udon Don Bar 吃饭，走不动就改在旁边的 Fine Food 食阁。夜间动物园最早 19:15 入园，门票不能退。不要把园内餐厅当正餐。可提前 2 小时预约夜间动物表演。门口能借免费轮椅，电车包含在门票里。去 Mandai 坐地铁到卡迪站再转园内巴士（2.5 新币），或直接 Grab。",
         stops: [
-          { time: "10:30", name: "新加坡植物园 Tanglin 门", addr: "Tanglin Gate, Napier Road", q: "Singapore Botanic Gardens Tanglin Gate", note: "围着天鹅湖慢慢走，走不动就坐长椅。", lat: 1.3040, lng: 103.8199 },
-          { time: "12:00", name: "PS.Cafe", addr: "28 Harding Road, Dempsey", q: "PS.Cafe Harding Road Dempsey Singapore", note: "从植物园门口打车大约 5 分钟。", lat: 1.3036, lng: 103.8109 },
+          { time: "10:30", name: "植物园 Tanglin 门 / 天鹅湖", addr: "Tanglin Gate, Napier Road", q: "Singapore Botanic Gardens Tanglin Gate", note: "进门就会经过天鹅湖，不用绕园。", lat: 1.3040, lng: 103.8199 },
+          { time: "11:00", name: "国家兰花园", addr: "National Orchid Garden", q: "National Orchid Garden Singapore Botanic Gardens", note: "植物园里最值得看的部分，大约走 1 小时。", lat: 1.3116, lng: 103.8154, tags: ["60岁以上3新币"] },
+          { time: "12:20", name: "国大大学城（NUS UTown）", addr: "1 Create Way, Town Plaza", q: "NUS University Town Town Plaza 1 Create Way", note: "从植物园打车大约 15 到 20 分钟。在 Udon Don Bar（#01-12）吃饭，备选 Fine Food 食阁。", lat: 1.3056, lng: 103.7733 },
           { time: "下午", name: "回酒店午睡", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "养足精神再去夜间动物园。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
           { time: "17:00", name: "City Square Mall 晚饭", addr: "180 Kitchener Road", q: "City Square Mall 180 Kitchener Road Singapore", note: "芬雷公园，有空调，海南鸡饭或面都可以。", lat: 1.3116, lng: 103.8566 },
           { time: "19:15", name: "夜间动物园", addr: "80 Mandai Lake Road", q: "Night Safari 80 Mandai Lake Road Singapore", note: "大约 17:45 从商场出发。门票不能退。", lat: 1.4023, lng: 103.7880, tags: ["不能退票"] },
@@ -231,17 +236,19 @@
         label: "10日",
         weekday: "周二",
         color: "#b0891a",
-        title: "牛车水加滨海湾",
-        blurb: "中午麦士威和佛牙寺，这两处走得到。晚上老巴刹吃沙爹，再去看超级树灯光秀，回程看彩灯。",
-        tips: "Holland 中午有会，长辈上午可先在酒店休息。晚上汇合后大约点 30 串沙爹。超级树 Garden Rhapsody 约 20:45。回程让司机走实龙岗路，屠妖节彩灯亮到 11 月 29 日，晚上 7 点到午夜。",
+        title: "牛车水、云雾林和超级树",
+        blurb: "Holland 可能整天有事，长辈按这份清单自己走：中午牛车水吃饭看庙，下午直接去滨海湾花园看云雾林和花穹，咖啡馆休息，晚上汇合吃老巴刹，再看超级树灯光秀。",
+        tips: "这一天不必回酒店午睡，牛车水离滨海湾花园很近，看完云雾林就在金沙或园里坐下歇着，等晚上汇合。游客花穹+云雾林联票成人 46 新币，现场或官网买；云雾林里有侏罗纪世界展览，有较大声响和闪光。超级树 Garden Rhapsody 免费，每天 19:45 和 20:45，吃完沙爹看 20:45 这场更从容。回程让司机走实龙岗路看灯，不要下车。",
         stops: [
-          { time: "上午", name: "酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "不着急出门。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "上午", name: "酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "不着急出门，按清单自己走即可。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
           { time: "11:30", name: "麦士威 / 天天海南鸡饭", addr: "1 Kadayanallur Street", q: "Maxwell Food Centre Tian Tian Hainanese Chicken Rice", note: "中午在这里吃饭。", lat: 1.2803, lng: 103.8448 },
           { time: "12:30", name: "佛牙寺", addr: "288 South Bridge Road", q: "Buddha Tooth Relic Temple 288 South Bridge Road", note: "和麦士威同在牛车水，走过去就行。", lat: 1.2815, lng: 103.8443 },
-          { time: "下午", name: "回酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "晚上再出门汇合。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
-          { time: "19:00", name: "老巴刹沙爹", addr: "18 Raffles Quay", q: "Lau Pa Sat 18 Raffles Quay Singapore", note: "Holland 过来汇合。", lat: 1.2806, lng: 103.8504 },
-          { time: "20:45", name: "滨海湾花园超级树", addr: "Supertree Grove, Gardens by the Bay", q: "Supertree Grove Gardens by the Bay", note: "从老巴刹打车几分钟，看 Garden Rhapsody。", lat: 1.2819, lng: 103.8636 },
-          { time: "回程", name: "实龙岗路彩灯", addr: "Serangoon Road", q: "Serangoon Road Little India Singapore", note: "回酒店时让司机走这条路看灯。", lat: 1.3065, lng: 103.8520 }
+          { time: "13:15", name: "马里安曼兴都庙", addr: "244 South Bridge Road", q: "Sri Mariamman Temple 244 South Bridge Road", note: "就在佛牙寺隔壁同一条街，南印度风格的彩绘塔门。", lat: 1.2826, lng: 103.8451 },
+          { time: "14:00", name: "云雾林 / 花穹", addr: "18 Marina Gardens Drive, Gardens by the Bay", q: "Cloud Forest Gardens by the Bay", note: "从牛车水打车大约 10 分钟。联票大约各看 1 小时，走不动就主要看云雾林。", lat: 1.2840, lng: 103.8648 },
+          { time: "16:15", name: "金沙或园内休息", addr: "Marina Bay Sands", q: "Marina Bay Sands Singapore", note: "找有空调的咖啡厅坐下，不要回劳明达酒店，晚上还要回到这一带。", lat: 1.2837, lng: 103.8607, rest: true },
+          { time: "19:00", name: "老巴刹沙爹", addr: "18 Raffles Quay", q: "Lau Pa Sat 18 Raffles Quay Singapore", note: "Holland 过来汇合，大约点 30 串沙爹。", lat: 1.2806, lng: 103.8504 },
+          { time: "20:45", name: "滨海湾花园超级树", addr: "Supertree Grove, Gardens by the Bay", q: "Supertree Grove Gardens by the Bay", note: "免费灯光秀 Garden Rhapsody，约 15 分钟。从老巴刹打车几分钟。", lat: 1.2819, lng: 103.8636 },
+          { time: "回程", name: "实龙岗路彩灯（不下车）", addr: "Serangoon Road", q: "Serangoon Road Little India Singapore", note: "坐在 Grab 里看灯，不要下车散步。", lat: 1.3065, lng: 103.8520 }
         ]
       },
       {
@@ -250,14 +257,15 @@
         label: "11日",
         weekday: "周三",
         color: "#3d4e8a",
-        title: "还是酒店周边，然后去机场",
-        blurb: "早上苏丹回教堂，中午松发肉骨茶，回酒店取行李，下午坐车去樟宜。",
-        tips: "苏丹回教堂离酒店很近。松发有空调，从教堂打车大约 10 分钟。15:00 到 16:00 再出发去机场。晚饭在星耀樟宜、航站楼，或上了飞机再吃。",
+        title: "上午小印度，下午国家美术馆，再去机场",
+        blurb: "上午节后看小印度和兴都庙，中午松发肉骨茶，下午你放假后去国家美术馆看旧法院大楼和大草地，回酒店取行李，再去樟宜。",
+        tips: "小印度真正挤的是 7 日傍晚和 8 日屠妖节当天。11 日是节后周三上午，适合慢慢看，不必钻巷子。松发就在新桥路，吃完打车几分钟到国家美术馆。馆每天 10:00–19:00，游客普通票 20 新币、60 岁以上 15 新币；出发前只需走 45 到 60 分钟，看大楼、大草地 Padang，不必按官方说的逛 3 小时。然后回酒店取行李，15:30 到 16:00 再出发去机场更从容。晚饭在航站楼或上了飞机再吃。瀑布第一天早上已经看过。",
         stops: [
-          { time: "10:15", name: "苏丹回教堂 / 布索拉街", addr: "3 Muscat Street", q: "Sultan Mosque 3 Muscat Street Singapore", note: "和酒店同属这一带。", lat: 1.3023, lng: 103.8590 },
-          { time: "11:40", name: "松发肉骨茶", addr: "11 New Bridge Road #01-01", q: "Song Fa Bak Kut Teh 11 New Bridge Road", note: "有空调。吃完回酒店取行李。", lat: 1.2855, lng: 103.8448 },
-          { time: "午饭后", name: "回酒店取行李", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "打包后等车去机场。", lat: 1.3078, lng: 103.8626 },
-          { time: "15:00–16:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "坐 GrabFamily 或 6 座过去。", lat: 1.3644, lng: 103.9915, far: true }
+          { time: "10:15", name: "小印度 / 实龙岗路", addr: "141 Serangoon Road", q: "Sri Veeramakaliamman Temple 141 Serangoon Road", note: "节后工作日上午，避开了前夜和正日高峰。看街道和兴都庙外观即可。", lat: 1.3083, lng: 103.8527 },
+          { time: "11:40", name: "松发肉骨茶", addr: "11 New Bridge Road #01-01", q: "Song Fa Bak Kut Teh 11 New Bridge Road", note: "有空调。从小印度打车大约 10 分钟。", lat: 1.2855, lng: 103.8448 },
+          { time: "13:15", name: "国家美术馆", addr: "1 St Andrew's Road", q: "National Gallery Singapore 1 St Andrew's Road", note: "旧最高法院和市政厅改建，离松发很近。看外观、大草地，进馆走大约 1 小时。", lat: 1.2903, lng: 103.8515 },
+          { time: "14:30", name: "回酒店取行李", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "打包后出发去机场。", lat: 1.3078, lng: 103.8626 },
+          { time: "15:30–16:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "坐 GrabFamily 或 6 座过去。", lat: 1.3644, lng: 103.9915, far: true }
         ]
       }
     ];
