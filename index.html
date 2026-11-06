@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1F3A2E" />
+  <meta name="robots" content="noindex" />
+  <title>新加坡三人五日行程</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --ink: #1c241e;
+      --muted: #5c675f;
+      --card: #fffcf7;
+      --line: rgba(31, 58, 46, 0.12);
+      --accent: #1f3a2e;
+      --day: #b85c38;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+    body {
+      font-family: "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", system-ui, sans-serif;
+      color: var(--ink);
+      background: #dfe6da;
+      line-height: 1.45;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+
+    /* 地图铺满整屏 */
+    #map { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; background: #e8ecdf; }
+
+    /* 顶部日期条 */
+    #bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+      display: flex; gap: 6px;
+      padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+      background: var(--accent);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    }
+    .day {
+      flex: 1; min-width: 0; border: 0; border-radius: 14px;
+      padding: 7px 0 6px; line-height: 1.15; font: inherit; text-align: center;
+      background: rgba(255, 255, 255, 0.12); color: #f7f1e4;
+    }
+    .day b { display: block; font-size: 16px; }
+    .day small { display: block; font-size: 11px; opacity: 0.75; margin-top: 1px; }
+    .day.on { background: var(--c); color: #fff; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85); }
+    .day.on small { opacity: 0.95; }
+
+    /* 底部抽屉 */
+    #sheet {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      max-width: 640px; margin: 0 auto; height: 0;
+      display: flex; flex-direction: column;
+      background: var(--card);
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 -6px 28px rgba(20, 32, 25, 0.22);
+      transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    #sheet.drag { transition: none; }
+    .grab { flex: none; padding: 8px 16px 10px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+    .handle { display: block; width: 40px; height: 5px; border-radius: 3px; background: rgba(28, 36, 30, 0.22); margin: 0 auto 8px; }
+    .kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--day); }
+    .grab h2 { font-size: 19px; line-height: 1.25; margin-top: 1px; }
+
+    #body {
+      flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain; touch-action: pan-y;
+      padding: 0 16px calc(28px + env(safe-area-inset-bottom));
+      transition: opacity 0.2s;
+    }
+    #sheet.peek #body { opacity: 0; pointer-events: none; }
+
+    .blurb { font-size: 15px; color: var(--muted); margin: 2px 0 12px; }
+    .acts { display: flex; gap: 8px; margin-bottom: 6px; }
+    .acts a {
+      flex: 1; text-align: center; text-decoration: none; font-weight: 700; font-size: 15px;
+      padding: 13px 10px; border-radius: 14px; background: var(--day); color: #fff;
+    }
+    .acts a.sec { background: #fff; color: var(--accent); border: 1px solid var(--line); }
+
+    .stop {
+      position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 10px;
+      padding: 14px 10px; margin: 0 -10px; border-radius: 14px; cursor: pointer;
+    }
+    .stop + .stop::before { content: ""; position: absolute; top: 0; left: 10px; right: 10px; border-top: 1px solid var(--line); }
+    .stop.sel { background: rgba(31, 58, 46, 0.07); box-shadow: inset 3px 0 0 var(--day); }
+    .num {
+      width: 32px; height: 32px; border-radius: 50%; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--day); color: #fff; font-size: 14px; font-weight: 700;
+    }
+    .stop.rest .num { background: #c8c1b3; }
+    .time { font-size: 13px; font-weight: 700; color: var(--day); }
+    .name { font-size: 17px; font-weight: 700; margin: 2px 0; }
+    .addr, .note { font-size: 13px; color: var(--muted); }
+    .note { margin-top: 4px; font-size: 14px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag { font-size: 12px; font-weight: 650; padding: 3px 8px; border-radius: 999px; background: #efe6c9; color: #6a4f12; }
+    .tag.warn { background: #f8d7d0; color: #8a2c1c; }
+    .nav {
+      display: inline-block; margin-top: 10px; padding: 9px 16px; border-radius: 999px;
+      border: 1.5px solid var(--day); color: var(--day); font-size: 14px; font-weight: 700; text-decoration: none;
+    }
+
+    .tips { margin-top: 14px; padding: 14px 16px; background: #e7eee7; border-radius: 16px; font-size: 14px; color: #314338; }
+    .tips strong { display: block; margin-bottom: 6px; }
+    .foot { margin-top: 16px; font-size: 11px; color: var(--muted); text-align: center; }
+
+    /* 抽屉上方的悬浮按钮，跟着抽屉走 */
+    .fabs { position: absolute; right: 12px; bottom: calc(100% + 12px); display: flex; flex-direction: column; gap: 10px; transition: opacity 0.2s; }
+    #sheet.hi .fabs { opacity: 0; pointer-events: none; }
+    .fab {
+      width: 46px; height: 46px; border: 0; border-radius: 50%;
+      display: grid; place-items: center; background: #fff; color: var(--accent);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .fab svg { width: 22px; height: 22px; }
+
+    /* 地图上的编号圆标 */
+    .pinwrap { background: none; border: 0; }
+    .pin {
+      position: absolute; transform: translate(-50%, -50%);
+      min-width: 32px; height: 32px; padding: 0 8px; border-radius: 16px;
+      background: var(--c, #9a9384); color: #fff; border: 2px solid #fff;
+      font: 700 14px/28px -apple-system, "PingFang SC", sans-serif; text-align: center; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); transition: transform 0.15s;
+    }
+    .pin.sel { transform: translate(-50%, -50%) scale(1.3); }
+    .leaflet-tooltip.lbl {
+      background: #fff; color: var(--ink); border: 0; border-radius: 10px; padding: 5px 10px;
+      font: 700 13px/1.2 -apple-system, "PingFang SC", sans-serif; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    .me-dot { width: 18px; height: 18px; border-radius: 50%; background: #2a7fff; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(42, 127, 255, 0.25); }
+
+    #toast {
+      position: fixed; left: 50%; top: 84px; transform: translateX(-50%); z-index: 40;
+      max-width: 90vw; padding: 10px 16px; border-radius: 999px;
+      background: rgba(28, 36, 30, 0.92); color: #fff; font-size: 14px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <nav id="bar"></nav>
+
+  <section id="sheet">
+    <div class="fabs">
+      <button class="fab" id="locate" aria-label="定位到我的位置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg>
+      </button>
+      <button class="fab" id="fit" aria-label="显示今天全程">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+    <div class="grab" id="grab" role="button" aria-label="展开或收起行程">
+      <i class="handle"></i>
+      <div class="kicker" id="kicker"></div>
+      <h2 id="title"></h2>
+    </div>
+    <div id="body"></div>
+  </section>
+
+  <div id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const days = [
+      {
+        id: "d1",
+        date: "2026-11-07",
+        label: "7日",
+        weekday: "周六",
+        color: "#b85c38",
+        title: "落地，只待酒店周边",
+        blurb: "樟宜到酒店，中午潮八八，晚上芽笼田鸡粥，有精神再去克拉码头坐船。不去植物园，也不进小印度。",
+        tips: "潮八八四人桌已经订好。田鸡粥只收现金，点姜葱、不要辣。7到9号不要自己开车，叫 GrabFamily 或 6 座。屠妖节前夜小印度会很挤。",
+        stops: [
+          { time: "07:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "落地后坐 GrabFamily 或 6 座去酒店。", lat: 1.3644, lng: 103.9915, far: true },
+          { time: "08:00", name: "V Hotel Lavender", addr: "70 Jellicoe Road", q: "V Hotel Lavender 70 Jellicoe Road", note: "放行李，附近吃点早餐。下午 3 点办理入住、午睡。", lat: 1.3078, lng: 103.8626 },
+          { time: "11:30", name: "潮八八", addr: "101 Horne Road", q: "Chao Baba 101 Horne Road Singapore", note: "四人桌已订。离酒店很近。", lat: 1.3112, lng: 103.8617, tags: ["已订位"] },
+          { time: "15:00", name: "回酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "办理入住并午睡，养精神再出门。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "18:30", name: "明辉田鸡粥", addr: "323 Geylang Road", q: "Eminent Frog Porridge 323 Geylang Road", note: "从酒店过去几分钟。", lat: 1.3128, lng: 103.8793, tags: ["只收现金"] },
+          { time: "20:00", name: "克拉码头游船", addr: "Clarke Quay Jetty", q: "Clarke Quay Jetty Singapore River Cruise", note: "从芽笼打车大约 6 到 8 分钟。成人 28 新币，现场买即可。", lat: 1.2906, lng: 103.8465 }
+        ]
+      },
+      {
+        id: "d2",
+        date: "2026-11-08",
+        label: "8日",
+        weekday: "周日 · 屠妖节",
+        color: "#1b6b7a",
+        title: "整天圣淘沙",
+        blurb: "上午海洋馆，午饭就在怡丰城，下午西乐索海滩和缆车只选一样，晚上回酒店附近吃肉骨茶。",
+        tips: "海洋馆门票不能退：成人 55 新币，60 岁以上 43 新币。圣淘沙捷运 4 新币。缆车大约 17 新币。屠妖节当晚不要进小印度。",
+        stops: [
+          { time: "出发", name: "V Hotel Lavender", addr: "70 Jellicoe Road", q: "V Hotel Lavender 70 Jellicoe Road", note: "地铁或 Grab 去怡丰城，不要自己开车。", lat: 1.3078, lng: 103.8626 },
+          { time: "上午", name: "怡丰城", addr: "1 HarbourFront Walk", q: "VivoCity Singapore", note: "在这里转圣淘沙捷运。", lat: 1.2644, lng: 103.8222 },
+          { time: "10:00–12:30", name: "新加坡海洋馆", addr: "8 Sentosa Gateway", q: "Singapore Oceanarium 8 Sentosa Gateway", note: "门票不能退。", lat: 1.2582, lng: 103.8200, tags: ["不能退票"] },
+          { time: "午饭", name: "怡丰城吃饭", addr: "VivoCity 3 楼食阁 / 鼎泰丰 / 名胜世界", q: "VivoCity Din Tai Fung Singapore", note: "选有空调的地方，食阁、鼎泰丰或名胜世界都可以。", lat: 1.2644, lng: 103.8222 },
+          { time: "13:30–15:00", name: "西乐索海滩或缆车", addr: "Siloso Beach, Sentosa", q: "Siloso Beach Sentosa", note: "两样只选一样，老人不宜都走。然后回酒店休息。", lat: 1.2547, lng: 103.8118 },
+          { time: "18:30", name: "颜金猛肉骨茶", addr: "347 Balestier Road", q: "Founder Bak Kut Teh 347 Balestier Road", note: "从酒店往北一小段。没有空调，胡椒味重。", lat: 1.3259, lng: 103.8517 }
+        ]
+      },
+      {
+        id: "d3",
+        date: "2026-11-09",
+        label: "9日",
+        weekday: "周一 · 公休",
+        color: "#2e6b3f",
+        title: "上午植物园，晚上夜间动物园",
+        blurb: "只在植物园门口走天鹅湖，中午去旁边登普西吃饭，下午午睡，傍晚先吃饭再进园。",
+        tips: "植物园只走 Tanglin 门和天鹅湖 40 到 60 分钟，不走北门、不进热带雨林。Grab 直接送到门口。夜间动物园最早 19:15 入园，门票不能退。不要把园内餐厅当正餐。可提前 2 小时预约夜间动物表演。门口能借免费轮椅，电车包含在门票里。去 Mandai 坐地铁到卡迪站再转园内巴士（2.5 新币），或直接 Grab。",
+        stops: [
+          { time: "10:30", name: "新加坡植物园 Tanglin 门", addr: "Tanglin Gate, Napier Road", q: "Singapore Botanic Gardens Tanglin Gate", note: "围着天鹅湖慢慢走，走不动就坐长椅。", lat: 1.3040, lng: 103.8199 },
+          { time: "12:00", name: "PS.Cafe", addr: "28 Harding Road, Dempsey", q: "PS.Cafe Harding Road Dempsey Singapore", note: "从植物园门口打车大约 5 分钟。", lat: 1.3036, lng: 103.8109 },
+          { time: "下午", name: "回酒店午睡", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "养足精神再去夜间动物园。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "17:00", name: "City Square Mall 晚饭", addr: "180 Kitchener Road", q: "City Square Mall 180 Kitchener Road Singapore", note: "芬雷公园，有空调，海南鸡饭或面都可以。", lat: 1.3116, lng: 103.8566 },
+          { time: "19:15", name: "夜间动物园", addr: "80 Mandai Lake Road", q: "Night Safari 80 Mandai Lake Road Singapore", note: "大约 17:45 从商场出发。门票不能退。", lat: 1.4023, lng: 103.7880, tags: ["不能退票"] },
+          { time: "21:30", name: "Grab 回酒店", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "从园门口打车回劳明达。", lat: 1.3078, lng: 103.8626 }
+        ]
+      },
+      {
+        id: "d4",
+        date: "2026-11-10",
+        label: "10日",
+        weekday: "周二",
+        color: "#b0891a",
+        title: "牛车水加滨海湾",
+        blurb: "中午麦士威和佛牙寺，这两处走得到。晚上老巴刹吃沙爹，再去看超级树灯光秀，回程看彩灯。",
+        tips: "Holland 中午有会，长辈上午可先在酒店休息。晚上汇合后大约点 30 串沙爹。超级树 Garden Rhapsody 约 20:45。回程让司机走实龙岗路，屠妖节彩灯亮到 11 月 29 日，晚上 7 点到午夜。",
+        stops: [
+          { time: "上午", name: "酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "不着急出门。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "11:30", name: "麦士威 / 天天海南鸡饭", addr: "1 Kadayanallur Street", q: "Maxwell Food Centre Tian Tian Hainanese Chicken Rice", note: "中午在这里吃饭。", lat: 1.2803, lng: 103.8448 },
+          { time: "12:30", name: "佛牙寺", addr: "288 South Bridge Road", q: "Buddha Tooth Relic Temple 288 South Bridge Road", note: "和麦士威同在牛车水，走过去就行。", lat: 1.2815, lng: 103.8443 },
+          { time: "下午", name: "回酒店休息", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "晚上再出门汇合。", lat: 1.3078, lng: 103.8626, rest: true, skipRoute: true },
+          { time: "19:00", name: "老巴刹沙爹", addr: "18 Raffles Quay", q: "Lau Pa Sat 18 Raffles Quay Singapore", note: "Holland 过来汇合。", lat: 1.2806, lng: 103.8504 },
+          { time: "20:45", name: "滨海湾花园超级树", addr: "Supertree Grove, Gardens by the Bay", q: "Supertree Grove Gardens by the Bay", note: "从老巴刹打车几分钟，看 Garden Rhapsody。", lat: 1.2819, lng: 103.8636 },
+          { time: "回程", name: "实龙岗路彩灯", addr: "Serangoon Road", q: "Serangoon Road Little India Singapore", note: "回酒店时让司机走这条路看灯。", lat: 1.3065, lng: 103.8520 }
+        ]
+      },
+      {
+        id: "d5",
+        date: "2026-11-11",
+        label: "11日",
+        weekday: "周三",
+        color: "#3d4e8a",
+        title: "还是酒店周边，然后去机场",
+        blurb: "早上苏丹回教堂，中午松发肉骨茶，回酒店取行李，下午坐车去樟宜。",
+        tips: "苏丹回教堂离酒店很近。松发有空调，从教堂打车大约 10 分钟。15:00 到 16:00 再出发去机场。晚饭在星耀樟宜、航站楼，或上了飞机再吃。",
+        stops: [
+          { time: "10:15", name: "苏丹回教堂 / 布索拉街", addr: "3 Muscat Street", q: "Sultan Mosque 3 Muscat Street Singapore", note: "和酒店同属这一带。", lat: 1.3023, lng: 103.8590 },
+          { time: "11:40", name: "松发肉骨茶", addr: "11 New Bridge Road #01-01", q: "Song Fa Bak Kut Teh 11 New Bridge Road", note: "有空调。吃完回酒店取行李。", lat: 1.2855, lng: 103.8448 },
+          { time: "午饭后", name: "回酒店取行李", addr: "V Hotel Lavender", q: "V Hotel Lavender 70 Jellicoe Road", note: "打包后等车去机场。", lat: 1.3078, lng: 103.8626 },
+          { time: "15:00–16:00", name: "樟宜机场", addr: "Changi Airport, Singapore", q: "Changi Airport Singapore", note: "坐 GrabFamily 或 6 座过去。", lat: 1.3644, lng: 103.9915, far: true }
+        ]
+      }
+    ];
+
+    const $ = id => document.getElementById(id);
+    const barEl = $("bar"), sheet = $("sheet"), grab = $("grab"), bodyEl = $("body");
+    const HOTEL = "V Hotel Lavender 70 Jellicoe Road";
+    const mapsSearch = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+    const mapsDir = d => "https://www.google.com/maps/dir/" + d.stops.filter(s => !s.skipRoute).map(s => encodeURIComponent(s.q)).join("/");
+
+    // 底部安全区高度（iPhone 的 Home 条）
+    const SB = (() => {
+      const d = document.createElement("div");
+      d.style.cssText = "position:fixed;bottom:0;height:env(safe-area-inset-bottom,0px)";
+      document.body.appendChild(d);
+      const h = d.offsetHeight;
+      d.remove();
+      return h;
+    })();
+
+    let snap = "half", day, sel = -1, map, layer, bounds, markers = {}, me;
+
+    // ---------- 抽屉：三档高度，可拖拽 ----------
+    const snaps = () => {
+      const H = innerHeight;
+      return { peek: grab.offsetHeight + SB, half: Math.round(H * 0.48), full: H - barEl.offsetHeight };
+    };
+    function setVis(v) {
+      const S = snaps();
+      v = Math.max(S.peek - 10, Math.min(S.full, v));
+      sheet.style.height = v + "px";
+      sheet.classList.toggle("peek", v < S.peek + 30);
+      sheet.classList.toggle("hi", v > innerHeight * 0.7);
+      return v;
+    }
+    function goSnap(name) {
+      snap = name;
+      sheet.classList.remove("drag");
+      setVis(snaps()[name]);
+    }
+
+    let dg = null;
+    grab.addEventListener("pointerdown", e => {
+      dg = { y: e.clientY, v: sheet.offsetHeight, pts: [[e.clientY, e.timeStamp]], moved: false };
+      grab.setPointerCapture(e.pointerId);
+      sheet.classList.add("drag");
+    });
+    grab.addEventListener("pointermove", e => {
+      if (!dg) return;
+      const dy = e.clientY - dg.y;
+      if (Math.abs(dy) > 6) dg.moved = true;
+      dg.cur = setVis(dg.v - dy);
+      dg.pts.push([e.clientY, e.timeStamp]);
+      while (dg.pts.length > 2 && e.timeStamp - dg.pts[0][1] > 100) dg.pts.shift();
+    });
+    grab.addEventListener("pointerup", () => {
+      if (!dg) return;
+      const d = dg; dg = null;
+      if (!d.moved) return goSnap(snap === "peek" ? "half" : snap === "half" ? "full" : "half");
+      const [y0, t0] = d.pts[0], [y1, t1] = d.pts[d.pts.length - 1];
+      const vel = t1 > t0 ? (y1 - y0) / (t1 - t0) : 0; // px/ms，负数=向上
+      const proj = d.cur - vel * 200;
+      const S = snaps();
+      goSnap(Object.keys(S).reduce((a, b) => Math.abs(S[a] - proj) < Math.abs(S[b] - proj) ? a : b));
+    });
+    grab.addEventListener("pointercancel", () => { if (dg) { dg = null; goSnap(snap); } });
+
+    // ---------- 地图 ----------
+    function fit() {
+      if (!map || !bounds) return;
+      const S = snaps();
+      map.fitBounds(bounds, {
+        paddingTopLeft: [28, barEl.offsetHeight + 28],
+        paddingBottomRight: [28, Math.min(S[snap], S.half) + 28],
+        maxZoom: 16
+      });
+    }
+    // 把点放到「顶部条与抽屉之间」的中央
+    function focus(ll, z) {
+      if (!map) return;
+      const S = snaps(), H = innerHeight;
+      z = z || Math.max(map.getZoom(), 15);
+      const yc = (barEl.offsetHeight + H - Math.min(S[snap], S.half)) / 2;
+      map.flyTo(map.unproject(map.project(ll, z).add([0, H / 2 - yc]), z), z, { duration: 0.6 });
+    }
+    function drawMap() {
+      if (!map) return;
+      layer.clearLayers();
+      markers = {};
+      const route = day.stops.filter(s => !s.skipRoute).map(s => [s.lat, s.lng]);
+      L.polyline(route, { color: "#fff", weight: 8, opacity: 0.9, lineJoin: "round" }).addTo(layer);
+      L.polyline(route, { color: day.color, weight: 4.5, opacity: 0.95, lineJoin: "round" }).addTo(layer);
+      // 同一地点出现多次（如酒店、怡丰城）合并成一个标记，显示「2·4」
+      const groups = {};
+      day.stops.forEach((s, i) => { const k = s.lat + "," + s.lng; (groups[k] = groups[k] || []).push(i); });
+      Object.values(groups).forEach(ix => {
+        const s0 = day.stops[ix[0]], allRest = ix.every(i => day.stops[i].rest);
+        const m = L.marker([s0.lat, s0.lng], {
+          icon: L.divIcon({
+            className: "pinwrap", iconSize: [0, 0],
+            html: `<div class="pin" ${allRest ? "" : `style="--c:${day.color}"`}>${ix.map(i => i + 1).join("·")}</div>`
+          })
+        }).addTo(layer);
+        m.on("click", () => select(ix[0], true));
+        ix.forEach(i => { markers[i] = m; });
+      });
+      // 默认视野不含机场（太远会把市区压成一团），点机场那张卡仍会飞过去
+      bounds = L.latLngBounds(day.stops.filter(s => !s.far).map(s => [s.lat, s.lng]));
+      fit();
+    }
+
+    function select(i, fromMap) {
+      sel = i;
+      bodyEl.querySelectorAll(".stop").forEach(c => c.classList.toggle("sel", +c.dataset.i === i));
+      Object.values(markers).forEach(m => {
+        m.getElement().firstChild.classList.remove("sel");
+        m.unbindTooltip();
+        m.setZIndexOffset(0);
+      });
+      if (snap === "full" || (fromMap && snap === "peek")) goSnap("half");
+      const s = day.stops[i], m = markers[i];
+      if (m) {
+        m.getElement().firstChild.classList.add("sel");
+        m.bindTooltip(s.name, { permanent: true, direction: "top", offset: [0, -22], className: "lbl" }).openTooltip();
+        m.setZIndexOffset(1000);
+      }
+      focus([s.lat, s.lng]);
+      // 等抽屉动画结束再把这张卡滚进视野（点标记、或从全屏点卡片收起后都需要）
+      setTimeout(() => {
+        const c = bodyEl.querySelector(`.stop[data-i="${i}"]`);
+        if (c) c.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }, 320);
+    }
+
+    // ---------- 行程内容 ----------
+    function show(i) {
+      day = days[i];
+      sel = -1;
+      document.documentElement.style.setProperty("--day", day.color);
+      [...barEl.children].forEach((b, k) => b.classList.toggle("on", k === i));
+      $("kicker").textContent = `11月${day.label} ${day.weekday}`;
+      $("title").textContent = day.title;
+      bodyEl.innerHTML = `
+        <p class="blurb">${day.blurb}</p>
+        <div class="acts">
+          <a href="${mapsDir(day)}" target="_blank" rel="noopener">打开今天路线</a>
+          <a class="sec" href="${mapsSearch(HOTEL)}" target="_blank" rel="noopener">回酒店</a>
+        </div>
+        ${day.stops.map((s, k) => `
+          <article class="stop${s.rest ? " rest" : ""}" data-i="${k}">
+            <div class="num">${k + 1}</div>
+            <div>
+              <div class="time">${s.time}</div>
+              <div class="name">${s.name}</div>
+              <div class="addr">${s.addr}</div>
+              <div class="note">${s.note}</div>
+              ${s.tags ? `<div class="tags">${s.tags.map(t => `<span class="tag${/现金|不能/.test(t) ? " warn" : ""}">${t}</span>`).join("")}</div>` : ""}
+              <a class="nav" href="${mapsSearch(s.q)}" target="_blank" rel="noopener">导航到这里</a>
+            </div>
+          </article>`).join("")}
+        <div class="tips"><strong>当天注意</strong>${day.tips}</div>
+        <p class="foot">地图 © OpenStreetMap contributors</p>`;
+      bodyEl.scrollTop = 0;
+      goSnap(snap === "full" ? "half" : snap); // 标题行数可能变了，重算高度
+      drawMap();
+    }
+
+    bodyEl.addEventListener("click", e => {
+      if (e.target.closest("a")) return;
+      const c = e.target.closest(".stop");
+      if (c) select(+c.dataset.i);
+    });
+
+    // ---------- 悬浮按钮 ----------
+    let tt;
+    function toast(t) {
+      const e = $("toast");
+      e.textContent = t;
+      e.style.opacity = 1;
+      clearTimeout(tt);
+      tt = setTimeout(() => { e.style.opacity = 0; }, 2800);
+    }
+    $("fit").addEventListener("click", () => { if (snap === "full") goSnap("half"); fit(); });
+    $("locate").addEventListener("click", () => {
+      if (!navigator.geolocation) return toast("这个浏览器不支持定位");
+      navigator.geolocation.getCurrentPosition(p => {
+        const ll = [p.coords.latitude, p.coords.longitude];
+        if (me) me.setLatLng(ll);
+        else me = L.marker(ll, { icon: L.divIcon({ className: "pinwrap", iconSize: [0, 0], html: '<div class="me-dot" style="position:absolute;transform:translate(-50%,-50%)"></div>' }), interactive: false }).addTo(map);
+        if (snap === "full") goSnap("half");
+        focus(ll);
+      }, () => toast("拿不到定位，请在浏览器里允许定位权限"), { enableHighAccuracy: true, timeout: 10000 });
+    });
+
+    // ---------- 启动 ----------
+    days.forEach((d, i) => {
+      const b = document.createElement("button");
+      b.className = "day";
+      b.style.setProperty("--c", d.color);
+      b.innerHTML = `<b>${d.label}</b><small>${d.weekday.split(" · ")[0]}</small>`;
+      b.addEventListener("click", () => show(i));
+      barEl.appendChild(b);
+    });
+
+    if (window.L) {
+      map = L.map("map", { zoomControl: false, attributionControl: false }).setView([1.3, 103.85], 11);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+      layer = L.layerGroup().addTo(map);
+    } else {
+      toast("地图没加载出来，行程仍可查看");
+    }
+
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    let start = days.findIndex(d => d.date === todayStr);
+    if (start < 0) start = todayStr < days[0].date ? 0 : days.length - 1;
+
+    sheet.style.height = "0px";
+    show(start);
+    requestAnimationFrame(() => goSnap("half"));
+
+    addEventListener("resize", () => { if (map) map.invalidateSize(); goSnap(snap); });
+  </script>
+</body>
+</html>
